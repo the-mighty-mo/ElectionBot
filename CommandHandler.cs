@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +12,20 @@ namespace ElectionBot
 {
     public class CommandHandler
     {
-        public const char prefix = '!';
+        public const char prefix = '\\';
 
         private DiscordSocketClient _client;
         private CommandService _service;
+        private IServiceProvider _services;
 
-        public CommandHandler(DiscordSocketClient client)
+        public CommandHandler(DiscordSocketClient client, IServiceProvider services)
         {
             _client = client;
 
+            _services = services;
+
             _service = new CommandService();
-            _service.AddModulesAsync(Assembly.GetEntryAssembly());
+            _service.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
             _client.MessageReceived += HandleCommandAsync;
             _client.Connected += SendConnectMessage;
@@ -31,7 +35,7 @@ namespace ElectionBot
         {
             if (Program.isConsole)
             {
-                await Console.Out.WriteLineAsync("UCSGG Election Bot is Online");
+                await Console.Out.WriteLineAsync("UCD Election Bot is Online");
             }
         }
 
@@ -50,7 +54,7 @@ namespace ElectionBot
             {
                 if (msg.HasCharPrefix(prefix, ref argPos))
                 {
-                    var result = await _service.ExecuteAsync(context, argPos);
+                    var result = await _service.ExecuteAsync(context, argPos, _services);
 
                     if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     {

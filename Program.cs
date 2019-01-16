@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,13 +22,13 @@ namespace ElectionBot
 
         public static readonly bool isConsole = Console.OpenStandardInput(1) != Stream.Null;
 
-        public static Dictionary<ulong, string[]> userInfo = new Dictionary<ulong, string[]>();
+        public static Dictionary<string, List<string>> userData = new Dictionary<string, List<string>>();
 
         public async Task StartAsync()
         {
             if (isConsole)
             {
-                Console.Title = "UCSGG Election Bot";
+                Console.Title = "UCD Election Bot";
             }
 
             bool isRunning = System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Count() > 1;
@@ -38,7 +39,7 @@ namespace ElectionBot
 
                 if (isRunning)
                 {
-                    MessageBox.Show("Program is already running", "UCSGG Election Bot");
+                    MessageBox.Show("Program is already running", "UCD Election Bot");
                     return;
                 }
             }
@@ -55,13 +56,32 @@ namespace ElectionBot
 
             await _client.SetGameAsync("with election stuff.");
 
-            _handler = new CommandHandler(_client);
+            IServiceProvider _services = new ServiceCollection().BuildServiceProvider();
 
-            userInfo = await Files.FileToDictArray("voterids.txt", "voterkeys.txt");
+            _handler = new CommandHandler(_client, _services);
 
             if (isConsole)
             {
                 Console.WriteLine("The Election Bot is all set.");
+            }
+
+            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.csv");
+            foreach (string file in files)
+            {
+                char[] splits = { ',', '\n' };
+                string[] datas = File.ReadAllText(file).Split(splits);
+                
+                for (int i = 6; i < datas.Length; i++)
+                {
+                    List<string> userValues = new List<string>
+                    {
+                        datas[i + 1],
+                        datas[i + 3]
+                    };
+                    userData.Add(datas[i], userValues);
+
+                    i += 4;
+                }
             }
 
             await Task.Delay(-1);

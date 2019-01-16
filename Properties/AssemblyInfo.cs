@@ -1,17 +1,18 @@
-﻿using System.Reflection;
+﻿using System.Resources;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UCSGG Election Bot")]
-[assembly: AssemblyDescription("Handles election stuff for the UCSGG Discord Server")]
+[assembly: AssemblyTitle("UCD Election Bot")]
+[assembly: AssemblyDescription("Handles election stuff for the Utica Community Discord Server")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Staller Enterprises")]
-[assembly: AssemblyProduct("UCSGG Election Bot")]
-[assembly: AssemblyCopyright("Copyright © Staller Enterprises 2018")]
-[assembly: AssemblyTrademark("UCSGG™")]
+[assembly: AssemblyProduct("UCD Election Bot")]
+[assembly: AssemblyCopyright("Copyright © Staller Enterprises 2019")]
+[assembly: AssemblyTrademark("UCD™")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -20,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f7361021-7c25-4b4f-80fa-8c6911ef4656")]
+[assembly: Guid("bdf16732-1344-4501-8bb2-1eeb61e27461")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -33,4 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: NeutralResourcesLanguage("en-US")]
+
