@@ -1,2 +1,2 @@
 # ElectionBot
-UCSGG Server Election Bot
+UCD Server Election Bot
