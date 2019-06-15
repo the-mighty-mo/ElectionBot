@@ -23,12 +23,9 @@ namespace ElectionBot.Modules
             int i = 20, j = 1;
 
             ulong id = 0;
-            Action<TextChannelProperties> action = new Action<TextChannelProperties>(x =>
-            {
-                x.CategoryId = id;
-            });
+            Action<TextChannelProperties> action = new Action<TextChannelProperties>(x => x.CategoryId = id);
 
-            foreach (string user in Program.userData.Keys)
+            foreach (List<string> user in Program.userData.Keys)
             {
 
                 if (i >= 20)
@@ -36,22 +33,19 @@ namespace ElectionBot.Modules
                     id = Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == "voter group " + j) == null
                         ? (await Context.Guild.CreateCategoryChannelAsync("voter group " + j)).Id
                         : Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == "voter group " + j).Id;
-                    
-                    action = new Action<TextChannelProperties>(x =>
-                    {
-                        x.CategoryId = id;
-                    });
+
+                    action = new Action<TextChannelProperties>(x => x.CategoryId = id);
 
                     j++;
                     i = 0;
                 }
-                if (Context.Guild.Channels.FirstOrDefault(x => x.Name == Context.Guild.Users.FirstOrDefault(y => y.Username == user).Discriminator) == null)
+                if (Context.Guild.Channels.FirstOrDefault(x => x.Name == Context.Guild.Users.FirstOrDefault(y => y.Username == user[1]).Discriminator) == null)
                 {
-                    RestTextChannel chan = await Context.Guild.CreateTextChannelAsync(Context.Guild.Users.FirstOrDefault(x => x.Username == user).Discriminator, action);
-                    await chan.AddPermissionOverwriteAsync(Context.Guild.Users.FirstOrDefault(x => x.Username == user), allow);
+                    RestTextChannel chan = await Context.Guild.CreateTextChannelAsync(Context.Guild.Users.FirstOrDefault(x => x.Username == user[1]).Discriminator, action);
+                    await chan.AddPermissionOverwriteAsync(Context.Guild.Users.FirstOrDefault(x => x.Username == user[1]), allow);
                     await chan.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, deny);
 
-                    await chan.SendMessageAsync("Voter ID: " + user + "\n" +
+                    await chan.SendMessageAsync("Voter ID: " + user[1] + "\n" +
                         "Voter Key: " + Program.userData[user][0]);
                 }
 
@@ -91,7 +85,7 @@ namespace ElectionBot.Modules
             type = type.ElementAt(0).ToString().ToUpper() + type.Substring(1).ToLower();
             int i = 0, j = 1;
 
-            foreach (string user in Program.userData.Keys)
+            foreach (List<string> user in Program.userData.Keys)
             {
                 if (i >= 20)
                 {
@@ -99,7 +93,7 @@ namespace ElectionBot.Modules
                     i = 0;
                 }
 
-                await Context.Guild.Users.FirstOrDefault(x => x.Username == user).SendMessageAsync(
+                await Context.Guild.Users.FirstOrDefault(x => x.Username == user[1]).SendMessageAsync(
                     "__Voter Info for the Upcoming UCD " + type + " Election__\n" +
                     "Voting Group " + j.ToString() + "\n" +
                     "Voter ID: " + user + "\n" +
@@ -115,11 +109,11 @@ namespace ElectionBot.Modules
         [RequireOwner()]
         public async Task AddVoters(string type = "mod")
         {
-            Dictionary<string, List<string>> userInfo = new Dictionary<string, List<string>>();
+            Dictionary<List<string>, List<string>> userInfo = new Dictionary<List<string>, List<string>>();
             Random rng = new Random();
             int weight;
 
-            foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot))
+            foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot && x != Context.Guild.Owner))
             {
                 weight = 1;
 
@@ -137,13 +131,19 @@ namespace ElectionBot.Modules
                     weight = (type == "admin" && user.Roles.Contains(admCand)) ? 1 : 2;
                 }
 
+                List<string> userNames = new List<string>
+                {
+                    (user.Nickname ?? user.Username).Replace(",", ""),
+                    user.Username.Replace(",", "")
+                };
+
                 List<string> userValues = new List<string>
                 {
                     rng.Next(10000, 99999).ToString(),
                     weight.ToString()
                 };
 
-                userInfo.Add(user.Username, userValues);
+                userInfo.Add(userNames, userValues);
             }
             Program.userData = userInfo;
 
@@ -153,7 +153,7 @@ namespace ElectionBot.Modules
             int j = 1;
 
             File.WriteAllText(path, "name,voter_identifier,voter_key,email,vote_weight");
-            foreach (string key in userInfo.Keys)
+            foreach (List<string> key in userInfo.Keys)
             {
                 if (i >= 20)
                 {
@@ -164,7 +164,7 @@ namespace ElectionBot.Modules
                     i = 0;
                 }
 
-                File.AppendAllText(path, '\n' + key + "," + key + "," + userInfo[key][0] + ",," + userInfo[key][1]);
+                File.AppendAllText(path, '\n' + key[0] + "," + key[1] + "," + userInfo[key][0] + ",," + userInfo[key][1]);
                 i++;
             }
 

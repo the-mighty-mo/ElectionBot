@@ -1,11 +1,7 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ElectionBot
@@ -14,9 +10,9 @@ namespace ElectionBot
     {
         public const char prefix = '\\';
 
-        private DiscordSocketClient _client;
-        private CommandService _service;
-        private IServiceProvider _services;
+        private readonly DiscordSocketClient _client;
+        private readonly CommandService _service;
+        private readonly IServiceProvider _services;
 
         public CommandHandler(DiscordSocketClient client, IServiceProvider services)
         {
@@ -41,8 +37,7 @@ namespace ElectionBot
 
         private async Task HandleCommandAsync(SocketMessage m)
         {
-            SocketUserMessage msg = m as SocketUserMessage;
-            if (msg == null)
+            if (!(m is SocketUserMessage msg))
             {
                 return;
             }
@@ -50,7 +45,7 @@ namespace ElectionBot
             SocketCommandContext context = new SocketCommandContext(_client, msg);
 
             int argPos = 0;
-            if(!context.User.IsBot)
+            if (!context.User.IsBot)
             {
                 if (msg.HasCharPrefix(prefix, ref argPos))
                 {

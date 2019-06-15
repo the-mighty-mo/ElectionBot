@@ -3,9 +3,9 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,8 +13,7 @@ namespace ElectionBot
 {
     public class Program
     {
-        static void Main()
-            => new Program().StartAsync().GetAwaiter().GetResult();
+        static void Main() => new Program().StartAsync().GetAwaiter().GetResult();
 
         private DiscordSocketConfig _config;
         private DiscordSocketClient _client;
@@ -22,7 +21,7 @@ namespace ElectionBot
 
         public static readonly bool isConsole = Console.OpenStandardInput(1) != Stream.Null;
 
-        public static Dictionary<string, List<string>> userData = new Dictionary<string, List<string>>();
+        public static Dictionary<List<string>, List<string>> userData = new Dictionary<List<string>, List<string>>();
 
         public async Task StartAsync()
         {
@@ -31,11 +30,11 @@ namespace ElectionBot
                 Console.Title = "UCD Election Bot";
             }
 
-            bool isRunning = System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Count() > 1;
+            bool isRunning = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Count() > 1;
             if (isRunning)
             {
                 await Task.Delay(1000);
-                isRunning = System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Count() > 1;
+                isRunning = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Count() > 1;
 
                 if (isRunning)
                 {
@@ -70,15 +69,20 @@ namespace ElectionBot
             {
                 char[] splits = { ',', '\n' };
                 string[] datas = File.ReadAllText(file).Split(splits);
-                
+
                 for (int i = 6; i < datas.Length; i++)
                 {
+                    List<string> userNames = new List<string>
+                    {
+                        datas[i],
+                        datas[i + 2]
+                    };
                     List<string> userValues = new List<string>
                     {
                         datas[i + 1],
                         datas[i + 3]
                     };
-                    userData.Add(datas[i], userValues);
+                    userData.Add(userNames, userValues);
 
                     i += 4;
                 }
