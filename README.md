@@ -1,2 +1,2 @@
 # ElectionBot
-UCD Server Election Bot
+UCD Election Bot
