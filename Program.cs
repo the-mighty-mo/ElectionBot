@@ -27,7 +27,7 @@ namespace ElectionBot
         {
             if (isConsole)
             {
-                Console.Title = "UCD Election Bot";
+                Console.Title = SecurityInfo.botName;
             }
 
             bool isRunning = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Count() > 1;
@@ -38,7 +38,7 @@ namespace ElectionBot
 
                 if (isRunning)
                 {
-                    MessageBox.Show("Program is already running", "UCD Election Bot");
+                    MessageBox.Show("Program is already running", SecurityInfo.botName);
                     return;
                 }
             }
@@ -61,7 +61,7 @@ namespace ElectionBot
 
             if (isConsole)
             {
-                Console.WriteLine("The Election Bot is all set.");
+                Console.WriteLine($"{SecurityInfo.botName} has finished loading");
             }
 
             string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.csv");

@@ -30,9 +30,9 @@ namespace ElectionBot.Modules
 
                 if (i >= 20)
                 {
-                    id = Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == "voter group " + j) == null
-                        ? (await Context.Guild.CreateCategoryChannelAsync("voter group " + j)).Id
-                        : Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == "voter group " + j).Id;
+                    id = Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == $"voter group {j}") == null
+                        ? (await Context.Guild.CreateCategoryChannelAsync($"Voter Group {j}")).Id
+                        : Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == $"voter group {j}").Id;
 
                     action = new Action<TextChannelProperties>(x => x.CategoryId = id);
 
@@ -45,8 +45,8 @@ namespace ElectionBot.Modules
                     await chan.AddPermissionOverwriteAsync(Context.Guild.Users.FirstOrDefault(x => x.Username == user[1]), allow);
                     await chan.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, deny);
 
-                    await chan.SendMessageAsync("Voter ID: " + user[1] + "\n" +
-                        "Voter Key: " + Program.userData[user][0]);
+                    await chan.SendMessageAsync($"Voter ID: {user[1]}\n" +
+                        $"Voter Key: {Program.userData[user][0]}");
                 }
 
                 i++;
@@ -94,10 +94,10 @@ namespace ElectionBot.Modules
                 }
 
                 await Context.Guild.Users.FirstOrDefault(x => x.Username == user[1]).SendMessageAsync(
-                    "__Voter Info for the Upcoming UCD " + type + " Election__\n" +
-                    "Voting Group " + j.ToString() + "\n" +
-                    "Voter ID: " + user + "\n" +
-                    "Voter Key: " + Program.userData[user][0]);
+                    $"__Voter Info for the Upcoming UCD {type} Election__\n" +
+                    $"Voting Group: {j}\n" +
+                    $"Voter ID: {user}\n" +
+                    $"Voter Key: {Program.userData[user][0]}");
 
                 i++;
             }
@@ -139,7 +139,7 @@ namespace ElectionBot.Modules
 
                 List<string> userValues = new List<string>
                 {
-                    rng.Next(10000, 99999).ToString(),
+                    rng.Next(100000, 999999).ToString(),
                     weight.ToString()
                 };
 
@@ -158,13 +158,13 @@ namespace ElectionBot.Modules
                 if (i >= 20)
                 {
                     j++;
-                    path = "voters" + j.ToString() + ".csv";
+                    path = $"voters{j}.csv";
                     File.WriteAllText(path, "name,voter_identifier,voter_key,email,vote_weight");
 
                     i = 0;
                 }
 
-                File.AppendAllText(path, '\n' + key[0] + "," + key[1] + "," + userInfo[key][0] + ",," + userInfo[key][1]);
+                File.AppendAllText(path, $"\n{key[0]},{key[1]},{userInfo[key][0]},,{userInfo[key][1]}");
                 i++;
             }
 

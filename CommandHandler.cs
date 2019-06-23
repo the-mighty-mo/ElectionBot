@@ -31,7 +31,7 @@ namespace ElectionBot
         {
             if (Program.isConsole)
             {
-                await Console.Out.WriteLineAsync("UCD Election Bot is Online");
+                await Console.Out.WriteLineAsync($"{SecurityInfo.botName} Online");
             }
         }
 
@@ -53,7 +53,7 @@ namespace ElectionBot
 
                     if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     {
-                        await context.Channel.SendMessageAsync("Error: " + result.ErrorReason);
+                        await context.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
                     }
                 }
             }
