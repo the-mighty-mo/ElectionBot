@@ -27,7 +27,6 @@ namespace ElectionBot.Modules
 
             foreach (List<string> user in Program.userData.Keys)
             {
-
                 if (i >= 20)
                 {
                     id = Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == $"voter group {j}") == null
