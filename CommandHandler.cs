@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Reflection;
@@ -11,50 +12,64 @@ namespace ElectionBot
         public const char prefix = '\\';
 
         private readonly DiscordSocketClient _client;
-        private readonly CommandService _service;
+        private readonly CommandService _commands;
         private readonly IServiceProvider _services;
 
         public CommandHandler(DiscordSocketClient client, IServiceProvider services)
         {
             _client = client;
-
             _services = services;
 
-            _service = new CommandService();
-            _service.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            CommandServiceConfig config = new CommandServiceConfig()
+            {
+                DefaultRunMode = RunMode.Async
+            };
+            _commands = new CommandService(config);
+        }
 
-            _client.MessageReceived += HandleCommandAsync;
+        public async Task InitCommandsAsync()
+        {
             _client.Connected += SendConnectMessage;
+            _client.MessageReceived += HandleCommandAsync;
+
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            _commands.CommandExecuted += SendErrorAsync;
+        }
+
+        private async Task SendErrorAsync(Optional<CommandInfo> info, ICommandContext context, IResult result)
+        {
+            if (!result.IsSuccess && info.Value.RunMode == RunMode.Async && result.Error != CommandError.UnknownCommand && result.Error != CommandError.UnmetPrecondition)
+            {
+                await context.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
+            }
         }
 
         private async Task SendConnectMessage()
         {
             if (Program.isConsole)
             {
-                await Console.Out.WriteLineAsync($"{SecurityInfo.botName} Online");
+                await Console.Out.WriteLineAsync($"{SecurityInfo.botName} is online");
             }
         }
 
         private async Task HandleCommandAsync(SocketMessage m)
         {
-            if (!(m is SocketUserMessage msg))
+            if (!(m is SocketUserMessage msg) || msg.Author.IsBot)
             {
                 return;
             }
 
-            SocketCommandContext context = new SocketCommandContext(_client, msg);
+            SocketCommandContext Context = new SocketCommandContext(_client, msg);
 
             int argPos = 0;
-            if (!context.User.IsBot)
-            {
-                if (msg.HasCharPrefix(prefix, ref argPos))
-                {
-                    var result = await _service.ExecuteAsync(context, argPos, _services);
+            bool isCommand = msg.HasMentionPrefix(_client.CurrentUser, ref argPos) || msg.HasCharPrefix(prefix, ref argPos);
 
-                    if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                    {
-                        await context.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
-                    }
+            if (isCommand)
+            {
+                var result = await _commands.ExecuteAsync(Context, argPos, _services);
+                if (!result.IsSuccess && result.Error == CommandError.UnmetPrecondition)
+                {
+                    await Context.Channel.SendMessageAsync(result.ErrorReason);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,18 @@ namespace ElectionBot
 {
     public class Program
     {
-        static void Main() => new Program().StartAsync().GetAwaiter().GetResult();
-
         private DiscordSocketConfig _config;
         private DiscordSocketClient _client;
         private CommandHandler _handler;
 
+        public static readonly Random rng = new Random();
+
+        public static readonly SqliteConnection cnVoters = new SqliteConnection("Filename=Voters.db");
+        public static readonly SqliteConnection cnElection = new SqliteConnection("Filename=Election.db");
+
         public static readonly bool isConsole = Console.OpenStandardInput(1) != Stream.Null;
 
-        public static Dictionary<List<string>, List<string>> userData = new Dictionary<List<string>, List<string>>();
+        static void Main() => new Program().StartAsync().GetAwaiter().GetResult();
 
         public async Task StartAsync()
         {
@@ -43,6 +47,12 @@ namespace ElectionBot
                 }
             }
 
+            List<Task> initSqlite = new List<Task>()
+            {
+                InitVotersSqlite(),
+                InitElectionSqlite()
+            };
+
             _config = new DiscordSocketConfig
             {
                 AlwaysDownloadUsers = false
@@ -58,37 +68,65 @@ namespace ElectionBot
             IServiceProvider _services = new ServiceCollection().BuildServiceProvider();
 
             _handler = new CommandHandler(_client, _services);
+            Task initCmd = _handler.InitCommandsAsync();
+
+            await Task.WhenAll(initSqlite);
 
             if (isConsole)
             {
                 Console.WriteLine($"{SecurityInfo.botName} has finished loading");
             }
 
-            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.csv");
-            foreach (string file in files)
+            await initCmd;
+            await Task.Delay(-1);
+        }
+
+        private async Task InitVotersSqlite()
+        {
+            await cnVoters.OpenAsync();
+
+            List<Task> cmds = new List<Task>();
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Voters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
             {
-                char[] splits = { ',', '\n' };
-                string[] datas = File.ReadAllText(file).Split(splits);
-
-                for (int i = 6; i < datas.Length; i++)
-                {
-                    List<string> userNames = new List<string>
-                    {
-                        datas[i],
-                        datas[i + 2]
-                    };
-                    List<string> userValues = new List<string>
-                    {
-                        datas[i + 1],
-                        datas[i + 3]
-                    };
-                    userData.Add(userNames, userValues);
-
-                    i += 4;
-                }
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Votes (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, cand_id TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVotes (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, cand_id TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVotes (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, cand_id TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnVoters))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
             }
 
-            await Task.Delay(-1);
+            await Task.WhenAll(cmds);
+        }
+
+        private async Task InitElectionSqlite()
+        {
+            await cnElection.OpenAsync();
+
+            List<Task> cmds = new List<Task>();
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnElection))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnElection))
+            {
+                cmds.Add(cmd.ExecuteNonQueryAsync());
+            }
         }
     }
 }
