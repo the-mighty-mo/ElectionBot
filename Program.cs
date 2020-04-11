@@ -81,7 +81,7 @@ namespace ElectionBot
             await Task.Delay(-1);
         }
 
-        private async Task InitVotersSqlite()
+        private static async Task InitVotersSqlite()
         {
             await cnVoters.OpenAsync();
 
@@ -114,7 +114,7 @@ namespace ElectionBot
             await Task.WhenAll(cmds);
         }
 
-        private async Task InitElectionSqlite()
+        private static async Task InitElectionSqlite()
         {
             await cnElection.OpenAsync();
 
