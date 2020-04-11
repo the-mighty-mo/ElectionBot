@@ -19,7 +19,6 @@ namespace ElectionBot.Modules.Votes
                 "administrator"
             };
             (bool isAdmin, bool isMod) voteType = (adminTypes.Contains(type), type != null);
-
         }
     }
 }
