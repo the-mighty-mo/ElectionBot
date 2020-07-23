@@ -20,7 +20,7 @@ namespace ElectionBot.Modules.ElectionRunner
                 "a",
                 "administrator"
             };
-            bool isAdmin = adminTypes.Contains(type);
+            bool isAdmin = adminTypes.Contains(type.ToLower());
 
             await SaveAsync(Context.Guild, isAdmin);
             await Context.Channel.SendMessageAsync("Voter IDs and Keys have been saved to `voters.csv` files.");

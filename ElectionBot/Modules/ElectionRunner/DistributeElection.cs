@@ -20,7 +20,7 @@ namespace ElectionBot.Modules.ElectionRunner
                 "a",
                 "administrator"
             };
-            bool isAdmin = adminTypes.Contains(type);
+            bool isAdmin = adminTypes.Contains(type.ToLower());
             type = isAdmin ? "Administrator" : "Moderator";
 
             OverwritePermissions bot = new OverwritePermissions().Modify(viewChannel: PermValue.Allow, sendMessages: PermValue.Allow);
@@ -35,7 +35,7 @@ namespace ElectionBot.Modules.ElectionRunner
                 if (i >= 20)
                 {
                     id = Context.Guild.CategoryChannels.FirstOrDefault(x => x.Name.ToLower() == $"voter group {j}")?.Id
-                        ?? (await Context.Guild.CreateCategoryChannelAsync($"Voter Group {j}", x => x.Position = j + 6)).Id;
+                        ?? (await Context.Guild.CreateCategoryChannelAsync($"Voter Group {j}", x => x.Position = j + 4)).Id;
 
                     j++;
                     i = 0;
