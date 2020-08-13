@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionBot", "ElectionBot\ElectionBot.csproj", "{BDF16732-1344-4501-8BB2-1EEB61E27461}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionBot", "ElectionBot\ElectionBot.csproj", "{A7D2239C-E77F-48EE-874E-4F99B55E7395}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BDF16732-1344-4501-8BB2-1EEB61E27461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDF16732-1344-4501-8BB2-1EEB61E27461}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDF16732-1344-4501-8BB2-1EEB61E27461}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDF16732-1344-4501-8BB2-1EEB61E27461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D2239C-E77F-48EE-874E-4F99B55E7395}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D2239C-E77F-48EE-874E-4F99B55E7395}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D2239C-E77F-48EE-874E-4F99B55E7395}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D2239C-E77F-48EE-874E-4F99B55E7395}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C0E584AC-9853-4884-A421-7316D859BB1A}
+		SolutionGuid = {ED06FD56-3ECB-46C3-A9C1-21CB2E5C86A2}
 	EndGlobalSection
 EndGlobal

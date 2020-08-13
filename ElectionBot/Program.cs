@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace ElectionBot
 {
@@ -42,7 +41,11 @@ namespace ElectionBot
 
                 if (isRunning)
                 {
-                    MessageBox.Show("Program is already running", SecurityInfo.botName);
+                    if (isConsole)
+                    {
+                        Console.WriteLine("Program is already running");
+                        Console.ReadLine();
+                    }
                     return;
                 }
             }
