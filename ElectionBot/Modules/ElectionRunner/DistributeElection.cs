@@ -45,10 +45,15 @@ namespace ElectionBot.Modules.ElectionRunner
                 if (channel == null)
                 {
                     channel = await Context.Guild.CreateTextChannelAsync(user.Discriminator, x => x.CategoryId = id);
+                }
+
+                do
+                {
                     await channel.AddPermissionOverwriteAsync(Context.Guild.CurrentUser, bot);
                     await channel.AddPermissionOverwriteAsync(user, allow);
                     await channel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, deny);
                 }
+                while (!Context.Guild.GetChannel(channel.Id)?.GetPermissionOverwrite(Context.Guild.EveryoneRole)?.Equals(deny) ?? true);
 
                 await channel.SendMessageAsync($"__Voter Info for the Upcoming UCD {type} Election__\n" +
                     $"Voter ID: {user.Username}\n" +
