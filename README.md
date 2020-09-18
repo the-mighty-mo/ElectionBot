@@ -5,4 +5,4 @@
 
 UCD Election Bot - Version 2.0
 
-Created with .NET Core 3.1, Discord.Net v2.2.0, and Microsoft.Data.Sqlite v3.1.7
+Created with .NET Core 3.1, Discord.Net v2.2.0, and Microsoft.Data.Sqlite v3.1.8
