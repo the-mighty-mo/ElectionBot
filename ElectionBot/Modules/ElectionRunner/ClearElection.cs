@@ -1,9 +1,8 @@
 ﻿using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using static ElectionBot.DatabaseManager;
 
 namespace ElectionBot.Modules.ElectionRunner
 {
@@ -25,7 +24,7 @@ namespace ElectionBot.Modules.ElectionRunner
             await Task.WhenAll
             (
                 DeleteFilesAsync(isAdmin),
-                RemoveElectionAsync(Context.Guild, isAdmin)
+                electionDatabase.Voters.RemoveElectionAsync(Context.Guild, isAdmin)
             );
             await Context.Channel.SendMessageAsync("The election has been cleared.");
         }
@@ -38,16 +37,6 @@ namespace ElectionBot.Modules.ElectionRunner
             {
                 File.Delete($"voters{i}-{(isAdmin ? "a" : "m")}-{Context.Guild.Id}.csv");
                 i++;
-            }
-        }
-
-        public static async Task RemoveElectionAsync(SocketGuild g, bool isAdmin)
-        {
-            string delete = $"DELETE FROM {(isAdmin ? "Admin" : "Mod")}Voters WHERE guild_id = @guild_id;";
-            using (SqliteCommand cmd = new SqliteCommand(delete, Program.cnElection))
-            {
-                cmd.Parameters.AddWithValue("@guild_id", g.Id.ToString());
-                await cmd.ExecuteNonQueryAsync();
             }
         }
     }

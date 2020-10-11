@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static ElectionBot.DatabaseManager;
 
 namespace ElectionBot.Modules.ElectionRunner
 {
@@ -30,7 +31,7 @@ namespace ElectionBot.Modules.ElectionRunner
             int i = 20;
             int j = 1;
             ulong id = 0;
-            foreach ((SocketGuildUser user, int voterKey, int weight) in await SaveElection.GetVotersAsync(Context.Guild, isAdmin))
+            foreach ((SocketGuildUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild, isAdmin))
             {
                 if (i >= 20)
                 {

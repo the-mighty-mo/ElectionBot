@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using System.IO;
 using System.Threading.Tasks;
+using static ElectionBot.DatabaseManager;
 
 namespace ElectionBot.Modules.ElectionRunner
 {
@@ -14,8 +15,8 @@ namespace ElectionBot.Modules.ElectionRunner
             await Task.WhenAll
             (
                 DeleteFilesAsync(),
-                ClearElection.RemoveElectionAsync(Context.Guild, true),
-                ClearElection.RemoveElectionAsync(Context.Guild, false)
+                electionDatabase.Voters.RemoveElectionAsync(Context.Guild, true),
+                electionDatabase.Voters.RemoveElectionAsync(Context.Guild, false)
             );
             await Context.Channel.SendMessageAsync("All elections have been cleared.");
         }

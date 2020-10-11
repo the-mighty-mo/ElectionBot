@@ -1,9 +1,9 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static ElectionBot.DatabaseManager;
 
 namespace ElectionBot.Modules.ElectionRunner
 {
@@ -22,8 +22,8 @@ namespace ElectionBot.Modules.ElectionRunner
             };
             bool isAdmin = adminTypes.Contains(type.ToLower());
 
-            await ClearElection.RemoveElectionAsync(Context.Guild, isAdmin);
-            await SetVotersAsync(GetWeights(isAdmin), isAdmin);
+            await electionDatabase.Voters.RemoveElectionAsync(Context.Guild, isAdmin);
+            await electionDatabase.Voters.SetVotersAsync(GetWeights(isAdmin), isAdmin);
             await Context.Channel.SendMessageAsync("Voter IDs and Keys have been recorded.");
         }
 
@@ -53,29 +53,6 @@ namespace ElectionBot.Modules.ElectionRunner
 
                 yield return (user, Program.rng.Next(100000, 999999), weight);
             }
-        }
-
-        public static async Task SetVotersAsync(IEnumerable<(SocketGuildUser user, int voterKey, int weight)> userDatas, bool isAdmin)
-        {
-            string update = $"UPDATE {(isAdmin ? "Admin" : "Mod")}Voters SET voter_key = @voter_key, weight = @weight WHERE guild_id = @guild_id AND user_id = @user_id;";
-            string insert = $"INSERT INTO {(isAdmin ? "Admin" : "Mod")}Voters (guild_id, user_id, voter_key, weight) SELECT @guild_id, @user_id, @voter_key, @weight WHERE (SELECT Changes() = 0);";
-
-            List<Task> cmds = new List<Task>();
-            await Task.Yield();
-            foreach ((SocketGuildUser user, int voterKey, int weight) in userDatas)
-            {
-                using (SqliteCommand cmd = new SqliteCommand(update + insert, Program.cnElection))
-                {
-                    cmd.Parameters.AddWithValue("@guild_id", user.Guild.Id.ToString());
-                    cmd.Parameters.AddWithValue("@user_id", user.Id.ToString());
-                    cmd.Parameters.AddWithValue("@voter_key", voterKey.ToString());
-                    cmd.Parameters.AddWithValue("@weight", weight);
-
-                    cmds.Add(cmd.ExecuteNonQueryAsync());
-                }
-            }
-
-            await Task.WhenAll(cmds);
         }
     }
 }
