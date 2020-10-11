@@ -7,25 +7,25 @@ namespace ElectionBot.Databases
 {
     public class ElectionDatabase
     {
-        private readonly SqliteConnection cnElection = new SqliteConnection("Filename=Election.db");
+        private readonly SqliteConnection connection = new SqliteConnection("Filename=Election.db");
 
-        public VotersTable Voters;
+        public readonly VotersTable Voters;
 
         public ElectionDatabase()
         {
-            Voters = new VotersTable(cnElection);
+            Voters = new VotersTable(connection);
         }
 
         public async Task InitAsync()
         {
-            await cnElection.OpenAsync();
+            await connection.OpenAsync();
 
             List<Task> cmds = new List<Task>();
-            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnElection))
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", connection))
             {
                 cmds.Add(cmd.ExecuteNonQueryAsync());
             }
-            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", cnElection))
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", connection))
             {
                 cmds.Add(cmd.ExecuteNonQueryAsync());
             }
@@ -33,13 +33,13 @@ namespace ElectionBot.Databases
             await Task.WhenAll(cmds);
         }
 
-        public async Task CloseAsync() => await cnElection.CloseAsync();
+        public async Task CloseAsync() => await connection.CloseAsync();
 
         public class VotersTable
         {
-            private readonly SqliteConnection cnElection;
+            private readonly SqliteConnection connection;
 
-            public VotersTable(SqliteConnection cnElection) => this.cnElection = cnElection;
+            public VotersTable(SqliteConnection connection) => this.connection = connection;
 
             public async Task SetVotersAsync(IEnumerable<(SocketGuildUser user, int voterKey, int weight)> userDatas, bool isAdmin)
             {
@@ -50,7 +50,7 @@ namespace ElectionBot.Databases
                 await Task.Yield();
                 foreach ((SocketGuildUser user, int voterKey, int weight) in userDatas)
                 {
-                    using (SqliteCommand cmd = new SqliteCommand(update + insert, cnElection))
+                    using (SqliteCommand cmd = new SqliteCommand(update + insert, connection))
                     {
                         cmd.Parameters.AddWithValue("@guild_id", user.Guild.Id.ToString());
                         cmd.Parameters.AddWithValue("@user_id", user.Id.ToString());
@@ -69,7 +69,7 @@ namespace ElectionBot.Databases
                 List<(SocketGuildUser user, int voterKey, int weight)> userDatas = new List<(SocketGuildUser user, int voterKey, int weight)>();
 
                 string getData = $"SELECT user_id, voter_key, weight FROM {(isAdmin ? "Admin" : "Mod")}Voters WHERE guild_id = @guild_id;";
-                using (SqliteCommand cmd = new SqliteCommand(getData, cnElection))
+                using (SqliteCommand cmd = new SqliteCommand(getData, connection))
                 {
                     cmd.Parameters.AddWithValue("@guild_id", g.Id.ToString());
 
@@ -92,7 +92,7 @@ namespace ElectionBot.Databases
             public async Task RemoveElectionAsync(SocketGuild g, bool isAdmin)
             {
                 string delete = $"DELETE FROM {(isAdmin ? "Admin" : "Mod")}Voters WHERE guild_id = @guild_id;";
-                using (SqliteCommand cmd = new SqliteCommand(delete, cnElection))
+                using (SqliteCommand cmd = new SqliteCommand(delete, connection))
                 {
                     cmd.Parameters.AddWithValue("@guild_id", g.Id.ToString());
                     await cmd.ExecuteNonQueryAsync();
