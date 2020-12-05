@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using ElectionBot.Databases;
+﻿using ElectionBot.Databases;
+using System.Threading.Tasks;
 
 namespace ElectionBot
 {
