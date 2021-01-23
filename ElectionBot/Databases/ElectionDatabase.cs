@@ -21,11 +21,7 @@ namespace ElectionBot.Databases
             await connection.OpenAsync();
 
             List<Task> cmds = new List<Task>();
-            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS ModVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", connection))
-            {
-                cmds.Add(cmd.ExecuteNonQueryAsync());
-            }
-            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS AdminVoters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", connection))
+            using (SqliteCommand cmd = new SqliteCommand("CREATE TABLE IF NOT EXISTS Voters (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, voter_key TEXT NOT NULL, weight INTEGER NOT NULL, UNIQUE (guild_id, user_id));", connection))
             {
                 cmds.Add(cmd.ExecuteNonQueryAsync());
             }
@@ -41,10 +37,10 @@ namespace ElectionBot.Databases
 
             public VotersTable(SqliteConnection connection) => this.connection = connection;
 
-            public async Task SetVotersAsync(IEnumerable<(SocketGuildUser user, int voterKey, int weight)> userDatas, bool isAdmin)
+            public async Task SetVotersAsync(IEnumerable<(SocketGuildUser user, int voterKey, int weight)> userDatas)
             {
-                string update = $"UPDATE {(isAdmin ? "Admin" : "Mod")}Voters SET voter_key = @voter_key, weight = @weight WHERE guild_id = @guild_id AND user_id = @user_id;";
-                string insert = $"INSERT INTO {(isAdmin ? "Admin" : "Mod")}Voters (guild_id, user_id, voter_key, weight) SELECT @guild_id, @user_id, @voter_key, @weight WHERE (SELECT Changes() = 0);";
+                string update = "UPDATE Voters SET voter_key = @voter_key, weight = @weight WHERE guild_id = @guild_id AND user_id = @user_id;";
+                string insert = "INSERT INTO Voters (guild_id, user_id, voter_key, weight) SELECT @guild_id, @user_id, @voter_key, @weight WHERE (SELECT Changes() = 0);";
 
                 List<Task> cmds = new List<Task>();
                 await Task.Yield();
@@ -64,11 +60,11 @@ namespace ElectionBot.Databases
                 await Task.WhenAll(cmds);
             }
 
-            public async Task<IEnumerable<(SocketGuildUser user, int voterKey, int weight)>> GetVotersAsync(SocketGuild g, bool isAdmin)
+            public async Task<IEnumerable<(SocketGuildUser user, int voterKey, int weight)>> GetVotersAsync(SocketGuild g)
             {
                 List<(SocketGuildUser user, int voterKey, int weight)> userDatas = new List<(SocketGuildUser user, int voterKey, int weight)>();
 
-                string getData = $"SELECT user_id, voter_key, weight FROM {(isAdmin ? "Admin" : "Mod")}Voters WHERE guild_id = @guild_id;";
+                string getData = "SELECT user_id, voter_key, weight FROM Voters WHERE guild_id = @guild_id;";
                 using (SqliteCommand cmd = new SqliteCommand(getData, connection))
                 {
                     cmd.Parameters.AddWithValue("@guild_id", g.Id.ToString());
@@ -89,9 +85,9 @@ namespace ElectionBot.Databases
                 return userDatas;
             }
 
-            public async Task RemoveElectionAsync(SocketGuild g, bool isAdmin)
+            public async Task RemoveElectionAsync(SocketGuild g)
             {
-                string delete = $"DELETE FROM {(isAdmin ? "Admin" : "Mod")}Voters WHERE guild_id = @guild_id;";
+                string delete = "DELETE FROM Voters WHERE guild_id = @guild_id;";
                 using (SqliteCommand cmd = new SqliteCommand(delete, connection))
                 {
                     cmd.Parameters.AddWithValue("@guild_id", g.Id.ToString());

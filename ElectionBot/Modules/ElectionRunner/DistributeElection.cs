@@ -13,17 +13,8 @@ namespace ElectionBot.Modules.ElectionRunner
         [Command("dist-election")]
         [Alias("distelection", "distribute-election")]
         [RequireOwner]
-        public async Task DistributeElectionAsync(string type)
+        public async Task DistributeElectionAsync()
         {
-            List<string> adminTypes = new List<string>()
-            {
-                "admin",
-                "a",
-                "administrator"
-            };
-            bool isAdmin = adminTypes.Contains(type.ToLower());
-            type = isAdmin ? "Administrator" : "Moderator";
-
             OverwritePermissions bot = new OverwritePermissions().Modify(viewChannel: PermValue.Allow, sendMessages: PermValue.Allow);
             OverwritePermissions allow = new OverwritePermissions().Modify(viewChannel: PermValue.Allow, sendMessages: PermValue.Deny);
             OverwritePermissions deny = new OverwritePermissions().Modify(viewChannel: PermValue.Deny);
@@ -31,7 +22,7 @@ namespace ElectionBot.Modules.ElectionRunner
             int i = 20;
             int j = 1;
             ulong id = 0;
-            foreach ((SocketGuildUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild, isAdmin))
+            foreach ((SocketGuildUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild))
             {
                 if (i >= 20)
                 {
@@ -56,7 +47,7 @@ namespace ElectionBot.Modules.ElectionRunner
                 }
                 while (!Context.Guild.GetChannel(channel.Id)?.GetPermissionOverwrite(Context.Guild.EveryoneRole)?.Equals(deny) ?? true);
 
-                await channel.SendMessageAsync($"__Voter Info for the Upcoming UCD {type} Election__\n" +
+                await channel.SendMessageAsync($"__Voter Info for the Upcoming UCD Administrator Election__\n" +
                     $"Voter ID: {user.Username}\n" +
                     $"Voter Key: {voterKey}");
 

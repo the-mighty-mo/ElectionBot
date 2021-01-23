@@ -12,22 +12,13 @@ namespace ElectionBot.Modules.ElectionRunner
         [Command("pdist-election")]
         [Alias("pdistelection", "pdistribute-election")]
         [RequireOwner]
-        public async Task PDistributeElectionAsync(string type)
+        public async Task PDistributeElectionAsync()
         {
-            List<string> adminTypes = new List<string>()
-            {
-                "admin",
-                "a",
-                "administrator"
-            };
-            bool isAdmin = adminTypes.Contains(type);
-            type = isAdmin ? "Administrator" : "Moderator";
-
             int i = 0;
             int j = 1;
 
             List<Task> cmds = new List<Task>();
-            foreach ((SocketUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild, isAdmin))
+            foreach ((SocketUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild))
             {
                 if (i >= 20)
                 {
@@ -35,7 +26,7 @@ namespace ElectionBot.Modules.ElectionRunner
                     i = 0;
                 }
 
-                cmds.Add(user.SendMessageAsync($"__Voter Info for the Upcoming UCD {type} Election__\n" +
+                cmds.Add(user.SendMessageAsync($"__Voter Info for the Upcoming UCD Administrator Election__\n" +
                     $"Voting Group: {j}\n" +
                     $"Voter ID: {user.Username}\n" +
                     $"Voter Key: {voterKey}"));

@@ -12,46 +12,32 @@ namespace ElectionBot.Modules.ElectionRunner
         [Command("init-election")]
         [Alias("initelection")]
         [RequireOwner]
-        public async Task InitElectionAsync(string type)
+        public async Task InitElectionAsync()
         {
-            List<string> adminTypes = new List<string>()
-            {
-                "admin",
-                "a",
-                "administrator"
-            };
-            bool isAdmin = adminTypes.Contains(type.ToLower());
-
-            await electionDatabase.Voters.RemoveElectionAsync(Context.Guild, isAdmin);
-            await electionDatabase.Voters.SetVotersAsync(GetWeights(isAdmin), isAdmin);
+            await electionDatabase.Voters.RemoveElectionAsync(Context.Guild);
+            await electionDatabase.Voters.SetVotersAsync(GetWeights());
             await Context.Channel.SendMessageAsync("Voter IDs and Keys have been recorded.");
         }
 
-        private IEnumerable<(SocketGuildUser user, int voterKey, int weight)> GetWeights(bool isAdmin)
+        private IEnumerable<(SocketGuildUser user, int voterKey, int weight)> GetWeights()
         {
             int weight;
 
             var roles = Context.Guild.Roles;
             SocketRole acceptedRole = roles.FirstOrDefault(x => x.Name.Contains("Accepted"));
             SocketRole adminRole = roles.FirstOrDefault(x => x.Name == "Adm");
-            SocketRole modRole = roles.FirstOrDefault(x => x.Name == "Mod");
             SocketRole adminCand = roles.FirstOrDefault(x => x.Name == "Admin Candidate");
+            SocketRole supremeCourt = roles.FirstOrDefault(x => x.Name == "Supreme Court Justices");
 
             foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot && x != Context.Guild.Owner && x.Roles.Contains(acceptedRole)))
             {
                 weight = 1;
                 if (user.Roles.Contains(adminRole))
                 {
-                    weight = isAdmin
-                        ? user.Roles.Contains(adminCand) ? 2 : 3
-                        : 2;
-                }
-                else if (user.Roles.Contains(modRole))
-                {
-                    weight = 2;
+                    weight = user.Roles.Contains(adminCand) || user.Roles.Contains(supremeCourt) ? 1 : 2;
                 }
 
-                yield return (user, Program.rng.Next(100000, 999999), weight);
+                yield return (user, Program.rng.Next(100000, 1000000), weight);
             }
         }
     }

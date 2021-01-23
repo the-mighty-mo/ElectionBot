@@ -11,31 +11,23 @@ namespace ElectionBot.Modules.ElectionRunner
         [Command("clear-election")]
         [Alias("clearelection")]
         [RequireOwner]
-        public async Task ClearElectionAsync(string type)
+        public async Task ClearElectionAsync()
         {
-            List<string> adminTypes = new List<string>()
-            {
-                "admin",
-                "a",
-                "administrator"
-            };
-            bool isAdmin = adminTypes.Contains(type);
-
             await Task.WhenAll
             (
-                DeleteFilesAsync(isAdmin),
-                electionDatabase.Voters.RemoveElectionAsync(Context.Guild, isAdmin)
+                DeleteFilesAsync(),
+                electionDatabase.Voters.RemoveElectionAsync(Context.Guild)
             );
             await Context.Channel.SendMessageAsync("The election has been cleared.");
         }
 
-        private async Task DeleteFilesAsync(bool isAdmin)
+        private async Task DeleteFilesAsync()
         {
             await Task.Yield();
             int i = 1;
-            while (File.Exists($"voters{i}-{(isAdmin ? "a" : "m")}-{Context.Guild.Id}.csv"))
+            while (File.Exists($"voters{i}-{Context.Guild.Id}.csv"))
             {
-                File.Delete($"voters{i}-{(isAdmin ? "a" : "m")}-{Context.Guild.Id}.csv");
+                File.Delete($"voters{i}-{Context.Guild.Id}.csv");
                 i++;
             }
         }
