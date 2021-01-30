@@ -10,7 +10,7 @@
     <Description>Handles election stuff for the Utica Community Discord Server</Description>
     <Company>Staller Enterprises</Company>
     <Product>UCD Election Bot</Product>
-    <Copyright>Copyright © Staller Enterprises 2019</Copyright>
+    <Copyright>Copyright © Staller Enterprises 2021</Copyright>
     <Authors>UCD™</Authors>
     <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.2.0" />
+    <PackageReference Include="Discord.Net" Version="2.3.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
   </ItemGroup>
