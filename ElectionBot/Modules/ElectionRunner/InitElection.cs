@@ -25,18 +25,10 @@ namespace ElectionBot.Modules.ElectionRunner
 
             var roles = Context.Guild.Roles;
             SocketRole acceptedRole = roles.FirstOrDefault(x => x.Name.Contains("Accepted"));
-            SocketRole adminRole = roles.FirstOrDefault(x => x.Name == "Adm");
-            SocketRole adminCand = roles.FirstOrDefault(x => x.Name == "Admin Candidate");
-            SocketRole supremeCourt = roles.FirstOrDefault(x => x.Name == "Supreme Court Justices");
 
             foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot && x != Context.Guild.Owner && x.Roles.Contains(acceptedRole)))
             {
                 weight = 1;
-                if (user.Roles.Contains(adminRole))
-                {
-                    weight = user.Roles.Contains(adminCand) || user.Roles.Contains(supremeCourt) ? 1 : 2;
-                }
-
                 yield return (user, Program.rng.Next(100000, 1000000), weight);
             }
         }
