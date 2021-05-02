@@ -7,15 +7,13 @@ namespace ElectionBot.Databases
 {
     public class ElectionDatabase
     {
-        private readonly SqliteConnection connection = new SqliteConnection("Filename=Election.db");
-        private readonly Dictionary<System.Type, ITable> tables = new Dictionary<System.Type, ITable>();
+        private readonly SqliteConnection connection = new("Filename=Election.db");
+        private readonly Dictionary<System.Type, ITable> tables = new();
 
         public VotersTable Voters => tables[typeof(VotersTable)] as VotersTable;
 
-        public ElectionDatabase()
-        {
+        public ElectionDatabase() =>
             tables.Add(typeof(VotersTable), new VotersTable(connection));
-        }
 
         public async Task InitAsync()
         {

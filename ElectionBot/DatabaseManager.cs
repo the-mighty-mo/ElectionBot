@@ -5,23 +5,16 @@ namespace ElectionBot
 {
     public static class DatabaseManager
     {
-        public static readonly VotersDatabase votersDatabase = new VotersDatabase();
-        public static readonly ElectionDatabase electionDatabase = new ElectionDatabase();
+        public static readonly ElectionDatabase electionDatabase = new();
 
-        public static async Task InitAsync()
-        {
+        public static async Task InitAsync() =>
             await Task.WhenAll(
-                votersDatabase.InitAsync(),
                 electionDatabase.InitAsync()
             );
-        }
 
-        public static async Task CloseAsync()
-        {
+        public static async Task CloseAsync() =>
             await Task.WhenAll(
-                votersDatabase.CloseAsync(),
                 electionDatabase.CloseAsync()
             );
-        }
     }
 }

@@ -17,7 +17,7 @@ namespace ElectionBot.Modules.ElectionRunner
             int i = 0;
             int j = 1;
 
-            List<Task> cmds = new List<Task>();
+            List<Task> cmds = new();
             foreach ((SocketUser user, int voterKey, int weight) in await electionDatabase.Voters.GetVotersAsync(Context.Guild))
             {
                 if (i >= 20)

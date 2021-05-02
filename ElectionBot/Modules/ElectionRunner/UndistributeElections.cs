@@ -15,7 +15,7 @@ namespace ElectionBot.Modules.ElectionRunner
         {
             var categories = Context.Guild.CategoryChannels.Where(x => x.Name.ToLower().StartsWith("voter group"));
 
-            List<Task> cmds = new List<Task>();
+            List<Task> cmds = new();
             foreach (SocketTextChannel channel in Context.Guild.TextChannels.Where(x => categories.Contains(x.Category)))
             {
                 cmds.Add(channel.DeleteAsync());
