@@ -1,4 +1,4 @@
-ElectionBot/bin/
-ElectionBot/obj/
+**/bin/
+**/obj/
 .vs/
-*.user
+**.user
