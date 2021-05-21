@@ -55,7 +55,7 @@ namespace ElectionBot.Databases.ElectionDatabaseTables
                 {
                     continue;
                 }
-                if (!int.TryParse(reader["voter_key"].ToString(), out int voterKey) || int.TryParse(reader["weight"].ToString(), out int weight))
+                if (!int.TryParse(reader["voter_key"].ToString(), out int voterKey) || !int.TryParse(reader["weight"].ToString(), out int weight))
                 {
                     continue;
                 }
