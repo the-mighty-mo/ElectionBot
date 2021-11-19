@@ -26,7 +26,7 @@ namespace ElectionBot.Modules.ElectionRunner
             var roles = Context.Guild.Roles;
             SocketRole acceptedRole = roles.FirstOrDefault(x => x.Name.Contains("Accepted"));
 
-            foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot && x != Context.Guild.Owner && x.Roles.Contains(acceptedRole)))
+            foreach (SocketGuildUser user in Context.Guild.Users.Where(x => !x.IsBot))
             {
                 weight = 1;
                 yield return (user, Program.rng.Next(100000, 1000000), weight);

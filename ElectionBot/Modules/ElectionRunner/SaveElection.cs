@@ -36,10 +36,10 @@ namespace ElectionBot.Modules.ElectionRunner
                 }
 
                 string name = user.Nickname ?? user.Username;
-                name = name.Contains(",") ? $"\"{name}\"" : name;
+                name = name.Contains(',') ? $"\"{name}\"" : name;
 
                 string username = user.Username;
-                username = username.Contains(",") ? $"\"{username}\"" : username;
+                username = username.Contains(',') ? $"\"{username}\"" : username;
 
                 File.AppendAllText(path, $"\n{name},{username},{voterKey},,{weight}");
                 i++;
